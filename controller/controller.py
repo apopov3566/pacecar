@@ -28,15 +28,17 @@ class Controller:
         self.timeout = None
         self.arduino = None
         self.serial_lock = threading.Lock()
+        self.written = 0
+        self.write_flush = 1000
 
-    def connect(self, port='COM3', baudrate=9600, timeout=.1):
+    def connect(self, port='COM3', baudrate=115200, timeout=.1):
         if not self.connected:
             self.port = port
             self.baudrate = baudrate
             self.timeout= timeout
             self.serial_lock.acquire()
             try:
-                self.arduino = serial.Serial(self.port, self.baudrate, timeout = self.timeout)
+                self.arduino = serial.Serial(self.port, self.baudrate, timeout = self.timeout, write_timeout = self.timeout)
                 self.connected = True
             except ValueError:
                 self.connected = False
@@ -47,14 +49,21 @@ class Controller:
             return True
 
     def send_raw_message(self, message):
-        #print(message)
         if not self.connected:
             raise ConnectionError(self.arduino)
 
         self.serial_lock.acquire()
-        if self.arduino.write(message) != len(message):
+        self.written += len(message)
+        if self.written > self.write_flush:
+            self.arduino.reset_input_buffer()
+            self.arduino.reset_output_buffer()
+        try:
+            if self.arduino.write(message) != len(message):
+                self.connected = False
+                print("failure sending message")
+        except serial.SerialTimeoutException:
             self.connected = False
-            print("failure sending message")
+            print("message time out")
         self.serial_lock.release()
 
     def send_message(self, cmd, val, rev=False):
@@ -114,9 +123,9 @@ if __name__ == '__main__':
 
     while(True):
         # c.set_mode(Mode.COMPUTER)
-        for i in range(-5,5,1):
-            c.set_steering(i / 20.0)
-            time.sleep(0.1)
-        for i in range(10,-10,-1):
-            c.set_steering(i / 20.0)
-            time.sleep(0.1)
+        for i in range(-255,255,1):
+            c.set_steering(i / 500.0)
+            time.sleep(0.001)
+        for i in range(255,-255,-1):
+            c.set_steering(i / 500.0)
+            time.sleep(0.001)

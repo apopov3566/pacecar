@@ -91,7 +91,7 @@
               
               void setup()  {
                   setup_pwmRead();                      
-                  Serial.begin(9600);
+                  Serial.begin(115200);
               }
               
               void loop()  {
@@ -554,7 +554,7 @@ void executeMessage() {
 
 void setup()  {
   setup_pwmRead();
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   while(!RC_avail()) {
     delay(10);
@@ -583,11 +583,10 @@ void loop() {
 
   if (Serial.available() > 0) {
     comm = Serial.readBytes(buffer, 2);
+    
     if (comm == 2 && checkBuffer()) {
       parseBuffer();
       executeMessage();
-    } else {
-      Serial.readBytes(buffer, 1); // message may be out of phase, attempt to get in phase
     }
   }
 

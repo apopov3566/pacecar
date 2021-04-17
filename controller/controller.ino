@@ -110,7 +110,7 @@
                       
                       print_decimal2percentage(RC_in[i]);   // uncomment to print calibrated receiver input (+-100%) to serial       
                     }
-                    Serial.println();                       // uncomment when printing calibrated receiver input to serial.
+                    // Serial.println();                       // uncomment when printing calibrated receiver input to serial.
                   }
               }
                */
@@ -121,7 +121,7 @@
  // This is equivelant to the using standard arduino pulseIn(pin, HIGH) function, but without blocking the code.
  
  if (PWM_read(1)){          // if a new pulse is detected on channel 1, print the pulse width to serial monitor.
-   Serial.println(PWM());
+   // Serial.println(PWM());
  } 
   */
  // Or 
@@ -130,7 +130,7 @@
  
  if (PWM_read(1)){                                      // if a new pulse is detected on channel 1
    Serial.print(PWM_period(),0);Serial.print("uS ");     
-   Serial.print(PWM_freq());Serial.println("Hz");
+   Serial.print(PWM_freq());// Serial.println("Hz");
  }
 
  */
@@ -432,7 +432,7 @@ void print_RCpwm(){                             // display the raw RC Channel PW
     if(PW[i] < 1000) Serial.print(" ");
     Serial.print(PW[i]);
   }
-  Serial.println("");
+  // Serial.println("");
 }
 
 void print_decimal2percentage(float dec){
@@ -483,79 +483,128 @@ float PWM_duty(){
 }
 
 // START_CODE
-
-modes mode = PASSTHROUGH;
-
-void setModeColor(enum modes m) {
-  analogWrite(9, mode_colors[m][0]);
-  analogWrite(10, mode_colors[m][1]);
-  analogWrite(11, mode_colors[m][2]);
-
-  Serial.print("mode set to: ");
-  Serial.println(mode_colors[m][0]);
-}
+modes mode;
+unsigned long heartbeat_time;
 
 int steer_neutral;
 int throttle_neutral;
 double throttle_pos;
 double steering_pos;
 
-Servo steer_servo;
+byte buffer[2];
+commands buffer_cmd;
+byte buffer_val;
+bool buffer_rev;
 
+Servo steer_servo;
 Servo throttle_servo;
 
-String comm;
+size_t comm;
+
+void setModeColor(enum modes m) {
+  //analogWrite(9, mode_colors[m][0]);
+  //analogWrite(10, mode_colors[m][1]);
+  //analogWrite(11, mode_colors[m][2]);
+
+  // Serial.print("mode set to: ");
+  // Serial.println(m);
+}
+
+bool checkBuffer() {
+  return (buffer[0] >> 5) == 0b101; // better system to be added later
+}
+
+void parseBuffer() {
+  buffer_val = buffer[1];
+  buffer_cmd = (commands) (buffer[0] & 0b1111);
+  buffer_rev = (buffer[0] >> 4) & 0b1;
+}
+
+void executeMessage() {
+  switch(buffer_cmd) {
+    case STATUS:
+      // Serial.println("status");
+      break;
+    case HEARTBEAT:
+      // Serial.println("HEARTBEAT");
+      heartbeat_time = millis();
+      break;
+    case MODE:
+      Serial.print("MODE ");
+      // Serial.println(buffer[1]);
+      mode = (modes) buffer[1];
+      setModeColor(mode);
+      steering_pos = 0;
+      throttle_pos = 0;
+      break;
+    case SET_STEER:
+      Serial.print("SET_STEER ");
+      // Serial.println(buffer[1]);
+      steering_pos = ((double) buffer[1]) / 255.0;
+      if (buffer_rev) steering_pos = steering_pos * -1;
+      break;
+    case SET_THROTTLE:
+      Serial.print("SET_THROTTLE ");
+      // Serial.println(buffer[1]);
+      throttle_pos = ((double) buffer[1]) / 255.0;
+      if (buffer_rev) throttle_pos = throttle_pos * -1;
+      break;
+  }
+}
 
 void setup()  {
-    setup_pwmRead();
-    Serial.begin(9600);
+  setup_pwmRead();
+  Serial.begin(9600);
 
-    while(!RC_avail()) {
-      delay(10);
-    }
+  while(!RC_avail()) {
+    delay(10);
+  }
 
-    throttle_neutral = PW[0];
-    steer_neutral = PW[1];
+  throttle_neutral = PW[0];
+  steer_neutral = PW[1];
 
-    throttle_servo.attach(5);
-    steer_servo.attach(6);
+  throttle_servo.attach(11);
+  steer_servo.attach(5);
 
-    pinMode(9, OUTPUT);
-    pinMode(10, OUTPUT);
-    pinMode(11, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
 
-    // setModeColor(mode);
-
-    //Serial.println("STARTED");
+  heartbeat_time = millis();
+  mode = PASSTHROUGH;
+  setModeColor(mode);
 }
+
 void loop() {
-    if(RC_avail()) {
+  if (mode != LOST && (millis() - heartbeat_time > MAX_HEARTBEAT_INTERVAL)) {
+    Serial.println("HEARTBEAT LOST");
+    mode = LOST; 
+  }
+
+  if (Serial.available() > 0) {
+    comm = Serial.readBytes(buffer, 2);
+    if (comm == 2 && checkBuffer()) {
+      parseBuffer();
+      executeMessage();
+    } else {
+      Serial.readBytes(buffer, 1); // message may be out of phase, attempt to get in phase
+    }
+  }
+
+
+  if (mode == PASSTHROUGH) {
+    if (RC_avail()) {
       throttle_pos = ((double)PW[0] - throttle_neutral) / WIDTH;
       steering_pos = ((double)PW[1] - steer_neutral) / WIDTH;
-
-      if (Serial.available() > 0) {
-        comm = Serial.readString();
-
-        if (comm[0] == 'm') {
-          if (comm[1] == 'p') mode = PASSTHROUGH;
-          else if (comm[1] == 'c') mode = COMPUTER;
-          else if (comm[1] == 'f') mode = LOST;
-
-          // setModeColor(mode);
-        }
-      }
-
-      if (mode == PASSTHROUGH) {
-        steer_prop = 1;//(1 - abs(throttle_pos)) * 0.5 + 0.5;
-        
-        steer_servo.write((steering_pos * steer_prop * STEER_WIDTH) + STEER_CENTER);
-        throttle_servo.write((throttle_pos * THROTTLE_WIDTH) + THROTTLE_CENTER);
-      } else if (mode == COMPUTER) {
-        steer_servo.write(STEER_CENTER);
-        throttle_servo.write(THROTTLE_CENTER);
-      } else if (mode == LOST) {
-        steer_servo.write(STEER_CENTER);
-        throttle_servo.write(THROTTLE_CENTER);
-      }
     }
+    steer_prop = 1;//(1 - abs(throttle_pos)) * 0.5 + 0.5;
+    steer_servo.write((steering_pos * steer_prop * STEER_WIDTH) + STEER_CENTER);
+    throttle_servo.write((throttle_pos * THROTTLE_WIDTH) + THROTTLE_CENTER);
+  } else if (mode == COMPUTER) {
+    steer_servo.write((steering_pos * steer_prop * STEER_WIDTH) + STEER_CENTER);
+    throttle_servo.write((throttle_pos * THROTTLE_WIDTH) + THROTTLE_CENTER);
+  } else {
+    steer_servo.write(STEER_CENTER);
+    throttle_servo.write(THROTTLE_CENTER);
+  }
 }

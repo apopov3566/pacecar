@@ -12,4 +12,4 @@ const double THROTTLE_WIDTH = 45;
 
 const int mode_colors[3][3] = {{100,0,0},{0,100,0},{0,0,100}};
 
-const unsigned long MAX_HEARTBEAT_INTERVAL = 1000;
+const unsigned long MAX_HEARTBEAT_INTERVAL = 0;

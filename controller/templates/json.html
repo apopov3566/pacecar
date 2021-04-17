@@ -1,0 +1,53 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<script type=text/javascript>
+callPath('smc')
+
+let keysPressed = {};
+
+document.addEventListener('keydown', (event) => {
+    if (!keysPressed[event.key]) {
+      keysPressed[event.key] = true;
+      processKeys()
+    }
+});
+
+document.addEventListener('keyup', (event) => {
+    delete keysPressed[event.key];
+    processKeys()
+ });
+
+function callPath(path) {
+  $.getJSON('/' + path, function(data) {});
+}
+
+function processKeys() {
+  if (keysPressed['a']) {
+    callPath('a')
+  } else if (keysPressed['d']) {
+    callPath('d')
+  } else {
+    callPath('cs')
+  }
+
+  if (keysPressed['w']) {
+    callPath('w')
+  } else if (keysPressed['s']) {
+    callPath('s')
+  } else {
+    callPath('ct')
+  }
+}
+
+</script>
+
+<body>
+  <div class="container">
+      <div class="row">
+          <div class="col-lg-8  offset-lg-2">
+              <h3 class="mt-5">Live Streaming</h3>
+              <img src="{{ url_for('video_feed') }}" width="100%">
+          </div>
+      </div>
+  </div>
+  </body>

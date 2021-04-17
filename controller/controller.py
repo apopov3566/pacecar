@@ -102,12 +102,12 @@ class Controller:
     def set_steering(self, angle):
         if angle < -1 or angle > 1:
             raise ValueError("angle out of range [-1,1]")
-        c.send_message(Command.SET_STEER, int(abs(255 * angle)), rev=(angle < 0))
+        self.send_message(Command.SET_STEER, int(abs(255 * angle)), rev=(angle < 0))
 
     def set_throttle(self, throttle):
         if throttle < -1 or throttle > 1:
             raise ValueError("throttle out of range [-1,1]")
-        c.send_message(Command.SET_THROTTLE, int(abs(255 * throttle)), rev=(throttle < 0))
+        self.send_message(Command.SET_THROTTLE, int(abs(255 * throttle)), rev=(throttle < 0))
 
 if __name__ == '__main__':
     c = Controller()

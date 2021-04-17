@@ -576,7 +576,7 @@ void setup()  {
 }
 
 void loop() {
-  if (mode != LOST && (millis() - heartbeat_time > MAX_HEARTBEAT_INTERVAL)) {
+  if (mode != LOST && MAX_HEARTBEAT_INTERVAL != 0 && (millis() - heartbeat_time > MAX_HEARTBEAT_INTERVAL)) {
     Serial.println("HEARTBEAT LOST");
     mode = LOST; 
   }

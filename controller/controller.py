@@ -9,11 +9,15 @@ class Command(IntEnum):
     MODE = 2
     SET_STEER = 3
     SET_THROTTLE = 4
+    SET_CAMERA = 5
+    SET_SPEED = 6
+    SET_DIST = 7
 
 class Mode(IntEnum):
     PASSTHROUGH = 0
     COMPUTER = 1
-    LOST = 2
+    COMPUTER_SC = 2
+    LOST = 3
 
 class ConnectionError(Exception):
     def __init__(self, device):
@@ -109,23 +113,37 @@ class Controller:
             raise ValueError("throttle out of range [-1,1]")
         self.send_message(Command.SET_THROTTLE, int(abs(255 * throttle)), rev=(throttle < 0))
 
+    def set_camera(self, angle):
+        if angle < -1 or angle > 1:
+            raise ValueError("camera angle out of range [-1,1]")
+        self.send_message(Command.SET_CAMERA, int(abs(255 * angle)), rev=(angle > 0))
+
+    def set_speed(self, speed):
+        if speed < -1 or speed > 1:
+            raise ValueError("speed out of range [-1,1]")
+        self.send_message(Command.SET_SPEED, int(abs(255 * speed)), rev=(speed < 0))
+
+    def set_distance(self, distance=None, unlimited=False):
+        if distance is not None:
+            if distance < 0 or distance > 1:
+                raise ValueError("distance out of range [0,1]")
+            self.send_message(Command.SET_DIST, int(abs(255 * distance)), rev=False)
+        elif unlimited:
+            self.send_message(Command.SET_DIST, 255, rev=True)
+
 if __name__ == '__main__':
     c = Controller()
     while not c.connected:
-        c.connect()
+        c.connect('/dev/cu.usbmodem141101')
         time.sleep(1)
     print("connected")
     c.start_heartbeat_thread(False)
     print("started heartbeat")
 
     time.sleep(1)
-    c.set_mode(Mode.COMPUTER)
+    c.set_mode(Mode.COMPUTER_SC)
 
-    while(True):
-        # c.set_mode(Mode.COMPUTER)
-        for i in range(-255,255,1):
-            c.set_steering(i / 500.0)
-            time.sleep(0.001)
-        for i in range(255,-255,-1):
-            c.set_steering(i / 500.0)
-            time.sleep(0.001)
+    c.set_steering(1)
+    c.set_camera(0)
+    c.set_distance(100)
+    c.set_speed(5)

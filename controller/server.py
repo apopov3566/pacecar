@@ -7,8 +7,10 @@ import cv2
 app = Flask(__name__)
 
 c = controller.Controller()
-c.connect()
+c.connect('/dev/cu.usbmodem141101')
 camera = cv2.VideoCapture(0)
+camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
 
 time.sleep(1)
 c.set_mode(controller.Mode.COMPUTER)
@@ -29,12 +31,12 @@ def s():
 
 @app.route('/a')
 def a():
-    c.set_steering(-0.5)
+    c.set_steering(-0.7)
     return ("nothing")
 
 @app.route('/d')
 def d():
-    c.set_steering(0.5)
+    c.set_steering(0.7)
     return ("nothing")
 
 @app.route('/cs')

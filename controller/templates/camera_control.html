@@ -1,0 +1,502 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.css" rel="stylesheet"/>
+<style>
+  body {
+    background-color: rgb(0, 16, 61);
+  }
+
+  h2 {
+    color: gold;
+  }
+
+  .rslider{
+    margin: auto;
+    display: inline-block;
+    margin: 0 20px 20px 20px;
+  }
+
+  .password_error {
+    background-color: red;
+    color: white;
+    display: none;
+    font-size: 10;
+    padding: 3px;
+  }
+
+  #controller {
+    text-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 525px;
+    height: 575px;
+    transform: translate(-50%, -50%);
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    background-color: rgb(80, 80, 80);
+    color: rgb(155, 155, 155);
+    border-style: solid;
+    border-radius: 25px;
+    display: none;
+  }
+
+  #login {
+    text-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 120px;
+    transform: translate(-50%, -50%);
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    background-color: rgb(80, 80, 80);
+    color: rgb(155, 155, 155);
+    border-style: solid;
+    border-radius: 25px;
+  }
+
+  .camera_controller {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 25px;
+    top: 75px;
+    background-color: white;
+    border-radius: 25px;
+    padding: 10px;
+    overflow: hidden;
+    margin: auto;
+    border-style: solid;
+  }
+
+  .x_controller {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 275px;
+    top: 75px;
+    background-color: white;
+    border-radius: 25px;
+    padding: 10px;
+    overflow: hidden;
+    margin: auto;
+    border-style: solid;
+  }
+
+  .y_controller {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 275px;
+    top: 325px;
+    background-color: white;
+    border-radius: 25px;
+    padding: 10px;
+    overflow: hidden;
+    margin: auto;
+    border-style: solid;
+  }
+
+  .size_controller {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 25px;
+    top: 325px;
+    background-color: white;
+    border-radius: 25px;
+    padding: 10px;
+    overflow: hidden;
+    margin: auto;
+    border-style: solid;
+  }
+
+  .button_holder {
+    position: absolute;
+    width: 200px;
+    top: 180px;
+    left: 10px;
+    text-align: center;
+    width: 200px;
+    z-index: 5;
+  }
+
+  .button {
+    background-color: lightgray;
+    border: none;
+    color: white;
+    padding: 4px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    margin: 2px 1px;
+    cursor: pointer;
+  }
+
+  .button:hover {
+    background-color: gold;
+    color:rgb(80, 80, 80);
+  }
+
+  .button_small {
+    background-color: lightgray;
+    border: none;
+    color: white;
+    padding: 4px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    margin: 2px 1px;
+    cursor: pointer;
+  }
+
+  .button_small:hover {
+    background-color: gold;
+    color:rgb(80, 80, 80);
+  }
+
+  .estop {
+    position: absolute;
+    width: 100px;
+    left: 175px;
+    top: 25px;
+  }
+
+  .estop_text {
+    position: absolute;
+    left: 160px;
+    top: 130px;
+  }
+
+  #camera_slider .rs-handle  {
+    background-color: transparent;
+    border: 8px solid transparent;
+    border-right-color: black;
+    margin: -6px 0px 0px 14px !important;
+    border-width: 6px 104px 6px 4px;
+  }
+  #camera_slider .rs-handle:before  {
+    display: block;
+    content: " ";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    background: black;
+    right: -11px;
+    bottom: -11px;
+    border-radius: 100px;
+  }
+  #camera_slider .rs-tooltip  {
+    top: 160%;
+    font-size: 11px;
+  }
+  #camera_slider .rs-tooltip div  {
+    text-align: center;
+    background: orange;
+    color: white;
+    border-radius: 4px;
+    padding: 1px 5px 2px;
+    margin-top: 4px;
+  }
+  #camera_slider .rs-range-color  {
+    background-color: #DB5959;
+  }
+  #camera_slider .rs-path-color  {
+    background-color: #ffeebf;
+  }
+
+  #x_slider .rs-handle  {
+    background-color: transparent;
+    border: 8px solid transparent;
+    border-right-color: black;
+    margin: -6px 0px 0px 14px !important;
+    border-width: 6px 104px 6px 4px;
+  }
+  #x_slider .rs-handle:before  {
+    display: block;
+    content: " ";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    background: black;
+    right: -11px;
+    bottom: -11px;
+    border-radius: 100px;
+  }
+  #x_slider .rs-tooltip  {
+    top: 160%;
+    font-size: 11px;
+  }
+  #x_slider .rs-tooltip div  {
+    text-align: center;
+    background: orange;
+    color: white;
+    border-radius: 4px;
+    padding: 1px 5px 2px;
+    margin-top: 4px;
+  }
+  #x_slider .rs-range-color  {
+    background-color: #DB5959;
+  }
+  #x_slider .rs-path-color  {
+    background-color: #ffeebf;
+  }
+
+  #y_slider .rs-handle  {
+    background-color: transparent;
+    border: 8px solid transparent;
+    border-right-color: black;
+    margin: -6px 0px 0px 14px !important;
+    border-width: 6px 104px 6px 4px;
+  }
+  #y_slider .rs-handle:before  {
+    display: block;
+    content: " ";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    background: black;
+    right: -11px;
+    bottom: -11px;
+    border-radius: 100px;
+  }
+  #y_slider .rs-tooltip  {
+    top: 160%;
+    font-size: 11px;
+  }
+  #y_slider .rs-tooltip div  {
+    text-align: center;
+    background: orange;
+    color: white;
+    border-radius: 4px;
+    padding: 1px 5px 2px;
+    margin-top: 4px;
+  }
+  #y_slider .rs-range-color  {
+    background-color: #DB5959;
+  }
+  #y_slider .rs-path-color  {
+    background-color: #ffeebf;
+  }
+
+  #size_slider .rs-handle  {
+    background-color: transparent;
+    border: 8px solid transparent;
+    border-right-color: black;
+    margin: -6px 0px 0px 14px !important;
+    border-width: 6px 104px 6px 4px;
+  }
+  #size_slider .rs-handle:before  {
+    display: block;
+    content: " ";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    background: black;
+    right: -11px;
+    bottom: -11px;
+    border-radius: 100px;
+  }
+  #size_slider .rs-tooltip  {
+    top: 75%;
+    font-size: 11px;
+  }
+  #size_slider .rs-tooltip div  {
+    text-align: center;
+    background: orange;
+    color: white;
+    border-radius: 4px;
+    padding: 1px 5px 2px;
+    margin-top: 4px;
+  }
+  #size_slider .rs-range-color  {
+    background-color: #DB5959;
+  }
+  #size_slider .rs-path-color  {
+    background-color: #ffeebf;
+  }
+</style>
+
+<script type=text/javascript>
+var password = "";
+var auth = false;
+
+function reset_camera() {
+  $("#camera_slider").data("roundSlider").setValue(0)
+}
+
+function scan() {
+  $.getJSON('/do_scan')
+}
+
+document.addEventListener('keydown', (event) => {
+    if(event.key == " ") {
+      reset_camera()
+      $("#x_slider").data("roundSlider").setValue(0)
+      $("#y_slider").data("roundSlider").setValue(0)
+      $("#size_slider").data("roundSlider").setValue(100)
+    }
+});
+</script>
+
+<body>
+  <div id="login">
+    <h3>Password</h3>
+    <div id="password_expired" class="password_error">Breach detected! please re-authenticate.</div>
+    <div id="password_wrong" class="password_error">Incorrect password! please try again.</div>
+    <input type="text" id="password" name="password">
+
+    <button class="button" onclick="do_login()">login</button>
+  </div>
+  <div id="controller">
+    <h2>Rover Camera Control</h2>
+    <div class="camera_controller">
+      Camera angle<br>
+      <div id="camera_slider" class="rslider"></div>
+      <div class="button_holder" onclick="reset_camera()"><button class="button">Reset</button></div>
+    </div>
+    <div class="x_controller">
+      x position<br>
+      <div id="x_slider" class="rslider"></div>
+    </div>
+    <div class="y_controller">
+      y position<br>
+      <div id="y_slider" class="rslider"></div>
+    </div>
+    <div class="size_controller">
+      Size<br>
+      <div id="size_slider" class="rslider"></div>
+      <div class="button_holder" onclick="scan()"><button class="button">Scan</button></div>
+    </div>
+  </div>
+  <script>
+    function set_camera(v) {
+      if(auth) {
+        $.getJSON('/set_camera', {"camera" : v.value})
+      }
+    }
+
+    function set_x(v) {
+      if(auth) {
+        $.getJSON('/set_x', {"x" : v.value})
+      }
+    }
+
+    function set_y(v) {
+      if(auth) {
+        $.getJSON('/set_y', {"y" : v.value})
+      }
+    }
+
+    function set_size(v) {
+      if(auth) {
+        $.getJSON('/set_size', {"size" : v.value})
+      }
+    }
+
+    function angleTooltip(e) {
+      return Math.round(e.value/100*135) + "°";
+    }
+    function locationTooltip(e) {
+      return e.value/100;
+    }    
+    function sizeTooltip(e) {
+      return e.value + "%";
+    }
+
+    function do_login() {
+      password = document.getElementById("password").value;
+      check_password();
+    }
+
+    function check_password() {
+      var jqxhr = $.getJSON("/check_password", {"password" : password},
+      function(data) {
+        if(data.status == "valid") {
+          auth = true;
+          document.getElementById("login").style.display = "none";
+          document.getElementById("controller").style.display = "block";
+          document.getElementById("password_wrong").style.display = "none";
+          document.getElementById("password_expired").style.display = "none";
+          setTimeout(check_password_repeated, 10000);
+        } else {
+          if (auth) {
+            document.getElementById("password_wrong").style.display = "none";
+            document.getElementById("password_expired").style.display = "block";
+          } else {
+            document.getElementById("password_wrong").style.display = "block";
+            document.getElementById("password_expired").style.display = "none";
+          }
+          auth = false;
+          document.getElementById("login").style.display = "block";
+          document.getElementById("controller").style.display = "none";
+        }
+      });
+    }
+
+    function check_password_repeated() {
+      if(auth) {
+        check_password();
+      }
+    }
+
+    $("#camera_slider").roundSlider({
+      sliderType: "pie",
+      editableTooltip: false,
+      max: "100",
+      min: "-100",
+      value: 0,
+      handleSize: 0,
+      handleShape: "square",
+      circleShape: "pie",
+      startAngle: 315,
+      valueChange: "set_camera",
+      tooltipFormat: "angleTooltip"
+    });
+
+    $("#x_slider").roundSlider({
+      sliderType: "half-top",
+      editableTooltip: false,
+      max: "100",
+      min: "-100",
+      value: 0,
+      handleSize: 0,
+      handleShape: "square",
+      circleShape: "half-top",
+      startAngle: 0,
+      valueChange: "set_x",
+      tooltipFormat: "locationTooltip"
+    });
+
+    $("#y_slider").roundSlider({
+      sliderType: "half-top",
+      editableTooltip: false,
+      max: "100",
+      min: "-100",
+      value: 0,
+      handleSize: 0,
+      handleShape: "square",
+      circleShape: "half-top",
+      startAngle: 0,
+      valueChange: "set_y",
+      tooltipFormat: "locationTooltip"
+    });
+
+    $("#size_slider").roundSlider({
+      sliderType: "pie",
+      editableTooltip: false,
+      max: "100",
+      min: "5",
+      value: 100,
+      handleSize: 0,
+      handleShape: "square",
+      circleShape: "pie",
+      startAngle: 315,
+      valueChange: "set_size",
+      tooltipFormat: "sizeTooltip"
+    });
+  </script>
+</body>

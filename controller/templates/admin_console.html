@@ -1,0 +1,59 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+
+<script type=text/javascript>
+
+function set_camera_mode(v) {
+  $.getJSON('/set_camera_mode', {"mode" : v})
+}
+
+function set_car_mode(v) {
+  $.getJSON('/set_car_mode', {"mode" : v})
+}
+
+function set_questioner_done() {
+  $.getJSON('/set_questioner_done')
+}
+
+function set_password() {
+  password = document.getElementById("password").value;
+  $.getJSON("/set_password", {"password" : password})
+}
+
+function set_round() {
+  round = document.getElementById("round").value;
+  $.getJSON("/set_round", {"round" : round})
+}
+
+</script>
+
+<body>
+  <div class="modes">
+    Full modes:<br>
+    <button onclick=set_camera_mode(1);set_car_mode(1)>On</button>
+    <button onclick=set_camera_mode(2);set_car_mode(3);set_questioner_done()>Done</button>
+    <button onclick=set_camera_mode(0);set_car_mode(3)>Off</button>
+  </div>
+  <div class="modes">
+    Camera modes:<br>
+    <button onclick=set_camera_mode(1)>On</button>
+    <button onclick=set_camera_mode(2)>Done</button>
+    <button onclick=set_camera_mode(0)>Off</button>
+  </div>
+  <div class="modes">
+    Car modes:<br>
+    <button onclick=set_car_mode(1)>Computer</button>
+    <button onclick=set_car_mode(2)>Computer + SC</button>
+    <button onclick=set_car_mode(3)>Off</button>
+  </div>
+  <div class="password">
+    Password:<br>
+    <input type="text" id="password" name="password">
+    <button onclick=set_password()>set</button>
+  </div>
+  <div class="round">
+    Round (1-4):<br>
+    <input type="text" id="round" name="round">
+    <button onclick=set_round()>set</button>
+  </div>
+</body>

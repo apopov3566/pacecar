@@ -1,0 +1,434 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.css" rel="stylesheet"/>
+<style>
+  body {
+    background-color: rgb(0, 16, 61);
+  }
+
+  h2 {
+    color: gold;
+  }
+
+  .rslider{
+    margin: auto;
+    display: inline-block;
+    margin: 0 20px 20px 20px;
+  }
+
+  .password_error {
+    background-color: red;
+    color: white;
+    display: none;
+    font-size: 10;
+    padding: 3px;
+  }
+
+  #controller {
+    text-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 525px;
+    height: 575px;
+    transform: translate(-50%, -50%);
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    background-color: rgb(80, 80, 80);
+    color: rgb(155, 155, 155);
+    border-style: solid;
+    border-radius: 25px;
+    display: none;
+  }
+
+  #login {
+    text-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 120px;
+    transform: translate(-50%, -50%);
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    background-color: rgb(80, 80, 80);
+    color: rgb(155, 155, 155);
+    border-style: solid;
+    border-radius: 25px;
+  }
+
+  .steering_controller {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 25px;
+    top: 75px;
+    background-color: white;
+    border-radius: 25px;
+    padding: 10px;
+    overflow: hidden;
+    margin: auto;
+    border-style: solid;
+  }
+
+  .throttle_controller {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 275px;
+    top: 75px;
+    background-color: white;
+    border-radius: 25px;
+    padding: 10px;
+    overflow: hidden;
+    margin: auto;
+    border-style: solid;
+  }
+
+  .go_controller {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 25px;
+    top: 325px;
+    background-color: white;
+    border-radius: 25px;
+    padding: 10px;
+    overflow: hidden;
+    margin: auto;
+    border-style: solid;
+  }
+
+  .stop_controller {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 275px;
+    top: 325px;
+    background-color: white;
+    border-radius: 25px;
+    padding: 10px;
+    overflow: hidden;
+    margin: auto;
+    border-style: solid;
+  }
+
+  .button_holder {
+    position: absolute;
+    width: 200px;
+    top: 180px;
+    left: 10px;
+    text-align: center;
+    width: 200px;
+    z-index: 5;
+  }
+
+  .button {
+    background-color: lightgray;
+    border: none;
+    color: white;
+    padding: 4px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    margin: 2px 1px;
+    cursor: pointer;
+  }
+
+  .button:hover {
+    background-color: gold;
+    color:rgb(80, 80, 80);
+  }
+
+  .button_small {
+    background-color: lightgray;
+    border: none;
+    color: white;
+    padding: 4px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    margin: 2px 1px;
+    cursor: pointer;
+  }
+  
+  .button_small:hover {
+    background-color: gold;
+    color:rgb(80, 80, 80);
+  }
+
+  .estop {
+    position: absolute;
+    width: 100px;
+    left: 60px;
+    top: 50px;
+  }
+
+  .estop_text {
+    position: absolute;
+    left: 35px;
+    top: 155px;
+  }
+
+  .engage {
+    position: absolute;
+    width: 100px;
+    left: 60px;
+    top: 50px;
+  }
+
+  .engage_text {
+    position: absolute;
+    left: 55px;
+    top: 155px;
+  }
+
+  #throttle_slider .rs-handle  {
+    background-color: transparent;
+    border: 8px solid transparent;
+    border-right-color: black;
+    margin: -6px 0px 0px 14px !important;
+    border-width: 6px 104px 6px 4px;
+  }
+  #throttle_slider .rs-handle:before  {
+    display: block;
+    content: " ";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    background: black;
+    right: -11px;
+    bottom: -11px;
+    border-radius: 100px;
+  }
+  #throttle_slider .rs-tooltip  {
+    top: 75%;
+    font-size: 11px;
+  }
+  #throttle_slider .rs-tooltip div  {
+    text-align: center;
+    background: orange;
+    color: white;
+    border-radius: 4px;
+    padding: 1px 5px 2px;
+    margin-top: 4px;
+  }
+  #throttle_slider .rs-range-color  {
+    background-color: gold;
+  }
+  #throttle_slider .rs-path-color  {
+    background-color: #ffeebf;
+  }
+
+  #steer_slider .rs-handle  {
+    background-color: transparent;
+    border: 8px solid transparent;
+    border-right-color: black;
+    margin: -6px 0px 0px 14px !important;
+    border-width: 6px 104px 6px 4px;
+  }
+  #steer_slider .rs-handle:before  {
+    display: block;
+    content: " ";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    background: black;
+    right: -11px;
+    bottom: -11px;
+    border-radius: 100px;
+  }
+  #steer_slider .rs-tooltip  {
+    top: 75%;
+    font-size: 11px;
+  }
+  #steer_slider .rs-tooltip div  {
+    text-align: center;
+    background: orange;
+    color: white;
+    border-radius: 4px;
+    padding: 1px 5px 2px;
+    margin-top: 4px;
+  }
+  #steer_slider .rs-path-color  {
+    background-color: #ffeebf;
+  }
+</style>
+
+<script type=text/javascript>
+var password = "";
+var auth = false;
+
+function do_login() {
+  password = document.getElementById("password").value;
+  check_password();
+}
+
+function check_password() {
+  var jqxhr = $.getJSON("/check_password", {"password" : password},
+  function(data) {
+    if(data.status == "valid") {
+      auth = true;
+      document.getElementById("login").style.display = "none";
+      document.getElementById("controller").style.display = "block";
+      document.getElementById("password_wrong").style.display = "none";
+      document.getElementById("password_expired").style.display = "none";
+      setTimeout(check_password_repeated, 10000);
+    } else {
+      if (auth) {
+        document.getElementById("password_wrong").style.display = "none";
+        document.getElementById("password_expired").style.display = "block";
+      } else {
+        document.getElementById("password_wrong").style.display = "block";
+        document.getElementById("password_expired").style.display = "none";
+      }
+      auth = false;
+      document.getElementById("login").style.display = "block";
+      document.getElementById("controller").style.display = "none";
+    }
+  });
+}
+
+function check_password_repeated() {
+  if(auth) {
+    check_password();
+    //setTimeout(check_password_repeated, 10000);
+  }
+}
+
+function reset_steer() {
+  $("#steer_slider").data("roundSlider").setValue(0)
+}
+
+function reset_throttle() {
+  $("#throttle_slider").data("roundSlider").setValue(0)
+}
+
+function set_steer(v) {
+  if (auth) {
+    $.getJSON('/set_steer', {"steer" : v.value})
+  }
+}
+
+function set_throttle(v) {
+  if (auth) {
+    $.getJSON('/set_throttle', {"throttle" : v.value * (throttle_rev ? -1 : 1)})
+  }
+}
+
+function set_command(a, d) {
+  if (auth) {
+    console.log(a, d)
+    $.getJSON('/set_command', {"distance" : d * (throttle_rev ? -1 : 1), "steer" : a})
+  }
+}
+
+throttle_rev = false;
+function reverse_throttle() {
+  throttle_rev = !throttle_rev
+  set_throttle_rev(throttle_rev);
+}
+
+function set_throttle_rev(rev) {
+  throttle_rev = rev
+  document.getElementById("throttle_rev_button").style.background=(rev ? '#F0C5C5' : 'lightgray');
+  // if(rev) {
+  //   $.getJSON('/do_reverse')
+  // }
+  reset_throttle()
+}
+
+function estop() {
+  reset_steer()
+  set_throttle_rev(false)
+  set_steer(0)
+  set_throttle(0)
+  set_command(0,0)
+}
+
+function engage() {
+  a = $("#steer_slider").data("roundSlider").getValue()
+  d = $("#throttle_slider").data("roundSlider").getValue()
+  set_command(a, d);
+}
+
+document.addEventListener('keydown', (event) => {
+    if(event.key == " ") {
+      estop()
+    }
+});
+</script>
+
+<body>
+  <div id="login">
+    <h3>Password</h3>
+    <div id="password_expired" class="password_error">Breach detected! please re-authenticate.</div>
+    <div id="password_wrong" class="password_error">Incorrect password! please try again.</div>
+    <input type="text" id="password" name="password">
+
+    <button class="button" onclick="do_login()">login</button>
+  </div>
+  <div id="controller">
+    <h2>Rover Driving Control</h2>
+    <div class="steering_controller">
+      Angle<br>
+      <div id="steer_slider" class="rslider"></div>
+      <div class="button_holder" onclick="reset_steer()"><button class="button">Reset</button></div>
+    </div>
+    <div class="throttle_controller">
+      Distance<br>
+      <div id="throttle_slider" class="rslider"></div>
+      <div class="button_holder">
+        <button id="throttle_rev_button" class="button_small" onclick="reverse_throttle()">Reverse</button>
+        <button class="button_small" onclick="reset_throttle()">Reset</button>
+      </div>
+    </div>
+    <div class="go_controller">
+      Execute
+      <img class="engage" src="{{ go_img }}" alt="Stop Image" onclick="engage()">
+      <div class="engage_text">click to execute</div>
+    </div>
+    <div class="stop_controller">
+      E-Stop
+      <img class="estop" src="{{ stop_img }}" alt="Stop Image" onclick="estop()">
+      <div class="estop_text">[space] or click to stop</div>
+    </div>
+  </div>
+  <script>
+    function steerTooltip(e) {
+      return Math.round(e.value/100*45) + "°";
+    }
+    function distanceTooltip(e) {
+      return Math.round(e.value * (throttle_rev ? -1 : 1)*3)/100 + " m";
+    }
+
+    $("#steer_slider").roundSlider({
+      sliderType: "custom-quarter",
+      editableTooltip: false,
+      max: "100",
+      min: "-100",
+      value: 0,
+      handleSize: 0,
+      handleShape: "square",
+      circleShape: "custom-quarter",
+      startAngle: 45,
+      //valueChange: "set_steer",
+      tooltipFormat: "steerTooltip"
+    });
+
+    $("#throttle_slider").roundSlider({
+      sliderType: "min-range",
+      editableTooltip: false,
+      max: "100",
+      min: "0",
+      value: 0,
+      handleSize: 0,
+      handleShape: "square",
+      circleShape: "pie",
+      startAngle: 315,
+      //valueChange: "set_throttle",
+      tooltipFormat: "distanceTooltip"
+    });
+  </script>
+</body>
